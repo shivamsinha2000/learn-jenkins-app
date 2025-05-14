@@ -10,7 +10,7 @@ pipeline {
                     reuseNode true
                 }
             }
-            
+
             steps {
                 sh '''
                     ls -la
@@ -80,17 +80,10 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm instal netlify-cli -g
-                    netlify --version
+                    npm instal netlify-cli 
+                    node_module/.bin/netlify --version
                     '''
             }
-        }
-
-
-    }
-    post {
-        always {
-            junit 'test-results/junit.xml'
         }
     }
 }
