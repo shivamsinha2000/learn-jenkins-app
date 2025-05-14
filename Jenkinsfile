@@ -10,7 +10,6 @@ pipeline {
                     reuseNode true
                 }
             }
-
             steps {
                 sh '''
                     ls -la
@@ -19,19 +18,19 @@ pipeline {
                     npm ci
                     npm run build
                     ls -la
-                    '''
+                '''
             }
         }
 
         stage('Tests') {
             parallel {
-                stage('Unit Tests') {
+                stage('Unit tests') {
                     agent {
                         docker {
                             image 'node:18-alpine'
                             reuseNode true
                         }
-                    }                    
+                    }
 
                     steps {
                         sh '''
@@ -41,7 +40,7 @@ pipeline {
                     }
                     post {
                         always {
-                            junit 'test-results/junit.xml'
+                            junit 'jest-results/junit.xml'
                         }
                     }
                 }
@@ -53,14 +52,16 @@ pipeline {
                             reuseNode true
                         }
                     }
+
                     steps {
                         sh '''
                             npm install serve
                             node_modules/.bin/serve -s build &
                             sleep 10
                             npx playwright test  --reporter=html
-                            '''
+                        '''
                     }
+
                     post {
                         always {
                             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
@@ -69,7 +70,6 @@ pipeline {
                 }
             }
         }
-        
 
         stage('Deploy') {
             agent {
@@ -80,9 +80,9 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm instal netlify-cli 
-                    node_module/.bin/netlify --version
-                    '''
+                    npm install netlify-cli@20.1.1
+                    node_modules/.bin/netlify --version
+                '''
             }
         }
     }
